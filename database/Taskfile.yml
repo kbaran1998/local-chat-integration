@@ -1,0 +1,52 @@
+version: '3'
+
+env:
+  DOCKER_API_VERSION: "1.53"
+
+tasks:
+  docker-check:
+    desc: Show which docker/compose are used and their API version (run if 'task up' fails)
+    cmds:
+      - echo "Docker:"; which docker; docker version --format "{{.Client.APIVersion}}"
+      - echo "Compose:"; which docker-compose 2>/dev/null || true; docker compose version 2>/dev/null || true
+
+  up:
+    desc: Start the database service in detached mode
+    cmds:
+      - docker compose -f docker-compose.yml up -d
+
+  up-build:
+    desc: Build and start the database service in detached mode
+    cmds:
+      - docker compose -f docker-compose.yml up -d --build
+
+  down:
+    desc: Stop and remove the database container
+    cmds:
+      - docker compose -f docker-compose.yml down
+
+  build:
+    desc: Build the database service image
+    cmds:
+      - docker compose -f docker-compose.yml build
+
+  ps:
+    desc: Show status of the database service
+    cmds:
+      - docker compose -f docker-compose.yml ps
+
+  logs:
+    desc: Tail logs from the database service
+    cmds:
+      - docker compose -f docker-compose.yml logs -f
+
+  restart:
+    desc: Restart the database service
+    cmds:
+      - docker compose -f docker-compose.yml restart
+
+  db-shell:
+    desc: Open a psql shell inside the db container
+    cmds:
+      - docker compose -f docker-compose.yml exec db psql -U postgres -d postgres
+

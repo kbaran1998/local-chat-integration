@@ -1,0 +1,65 @@
+---
+description: Ruff Rules
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# Ruff Standards (Python)
+
+This repo uses **Ruff** for **formatting** and **linting**. Follow these rules so changes pass `task format` and `task lint` with minimal back-and-forth.
+
+## Commands
+
+- **Format**: `task format`
+- **Lint**: `task lint`
+
+## What to optimize for
+
+Write Python that is:
+- **Readable and explicit** (prefer clarity over cleverness)
+- **Consistent** with Ruff formatting
+- **Maintainable** (small functions, clear names, minimal hidden side effects)
+- **Type-hint friendly** (add types where it improves clarity; keep interfaces explicit)
+
+> Ruff rules are configured in `api-server/pyproject.toml`. Rule reference: https://docs.astral.sh/ruff/rules/
+
+## Coding rules (practical + enforceable)
+
+### Formatting & imports
+- Don’t hand-format—let Ruff handle it.
+- Keep imports clean:
+  - No unused imports
+  - No star imports
+  - Prefer absolute imports unless the project style dictates otherwise
+  - Group and order imports as Ruff expects
+
+### Errors and exceptions
+- Avoid bare `except:`; catch specific exceptions.
+- Don’t silently swallow exceptions.
+- Include actionable context in raised errors and logs.
+
+### Functions and APIs
+- Prefer small, single-purpose functions.
+- Use explicit parameter names and return types when it improves readability.
+- Avoid surprising side-effects (mutating inputs, hidden globals).
+
+### Async & IO
+- Don’t block the event loop (no slow sync IO inside async code).
+- Use timeouts for network calls where applicable.
+- Keep resource lifetimes explicit (context managers for files/clients).
+
+### Style & readability
+- Prefer early returns over deeply nested conditionals.
+- Use descriptive names; avoid 1-letter variables except short scopes (`i`, `j` in loops).
+- Don’t overuse comprehensions when a simple loop is clearer.
+
+## When editing existing code
+- Match the surrounding style.
+- Don’t “cleanup” unrelated sections in the same PR unless requested.
+- If Ruff flags something nearby, fix it if it’s in the touched area.
+
+## Definition of done
+A change is done when:
+- `task format` makes no further changes
+- `task lint` passes with no warnings/errors
+- New/changed behavior is covered by existing tests or a minimal new test (when applicable)

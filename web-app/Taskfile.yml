@@ -1,0 +1,39 @@
+version: '3'
+
+env:
+  DOCKER_API_VERSION: "1.53"
+
+vars:
+  IMAGE_NAME: "web-app"
+
+tasks:
+  build:
+    desc: Build the web-app
+    cmds:
+      - pnpm build
+
+  install:
+    desc: Install the dependencies
+    cmds:
+      - pnpm install
+
+  down-docker:
+    desc: Stop and remove the web-app container
+    cmds:
+      - docker stop {{.IMAGE_NAME}}
+      - docker rm {{.IMAGE_NAME}}
+
+  build-docker:
+    desc: Build the web-app image
+    cmds:
+      - docker build -t {{.IMAGE_NAME}} .
+
+  run-docker:
+    desc: Run the web-app container
+    cmds:
+      - docker run -p 3000:3000 --network=host --name {{.IMAGE_NAME}} {{.IMAGE_NAME}}
+
+  run-docker-d:
+    desc: Run the web-app container in detached mode
+    cmds:
+      - docker run -p 3000:3000 --network=host -d --name {{.IMAGE_NAME}} {{.IMAGE_NAME}}

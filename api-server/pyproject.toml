@@ -1,0 +1,238 @@
+[project]
+name = "api-server"
+version = "0.1.0"
+description = "An API server for the local chat integration"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]>=0.135.1",
+    "sqlmodel>=0.0.37",
+    "asyncpg>=0.30.0",
+    "sse-starlette>=2.0.0",
+    "transformers>=4.48.0",
+    "torch>=2.5.0",
+    "accelerate>=1.2.0",
+    "pydantic-settings>=2.7.0",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.408",
+    "pytest>=9.0.2",
+    "ruff>=0.15.4",
+]
+
+[tool.pyright]
+extraPaths = ["."]
+# Relax typing for SQLModel and related packages (incomplete stubs / unknown types)
+reportUnknownMemberType = "none"
+reportUnknownVariableType = "none"
+
+[tool.isort]
+profile = "black"
+
+[tool.pylint.basic]
+argument-naming-style = "snake_case"
+class-naming-style = "PascalCase"
+const-naming-style = "UPPER_CASE"
+variable-naming-style = "snake_case"
+source-roots = ["src", "tests"]
+
+[tool.pylint.messages_control]
+max-line-length = 100
+disable = [
+    "no-member",
+    "no-else-return",
+    "no-else-raise",
+    "protected-access",
+    "too-few-public-methods",
+    "too-many-arguments",
+]
+output-format = "colorized"
+
+[tool.pylint.design]
+max-returns = 8
+
+[tool.ruff]
+target-version = "py310"
+line-length = 100
+show-fixes = true
+cache-dir = ".cache/ruff"
+exclude = [
+    ".venv",
+    ".pytest_cache",
+    ".git",
+    "__pycache__",
+    "generated",
+    "scripts",
+    "data",
+    ".cache",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+typing-modules = ["typing"]
+select = [
+    "A",     # Builtins
+    "ANN",   # Annotations
+    "ARG",   # Unused arguments
+    "ASYNC", # Asynchronous code
+    "B",     # Bugbear
+    "BLE",   # Blind except
+    "C4",    # Comprehensions
+    "C90",   # mccabe
+    "COM",   # Commas
+    "D1",    # Undocumented public elements
+    "D2",    # Docstring conventions
+    "D3",    # Triple double quotes
+    "D4",    # Docstring text format
+    "DTZ",   # Datetimes
+    "E",     # Errors
+    "EM",    # Error messages
+    "ERA",   # Commented-out code
+    "EXE",   # Executable
+    "F",     # Pyflakes
+    "FA",    # __future__ annotations
+    "FBT",   # "Boolean trap"
+    "FIX",   # "FIXME"-comments
+    "FLY",   # F-strings
+    "FURB",  # Refurb
+    "G",     # Logging format
+    "I",     # Isort
+    "ICN",   # Import conventions
+    "INP",   # Disallow PEP-420 (Implicit namespace packages)
+    "INT",   # gettext
+    "ISC",   # Implicit str concat
+    "LOG",   # Logging
+    "N",     # PEP-8 Naming
+    "NPY",   # Numpy
+    "PD",    # Pandas
+    "PERF",  # Unnecessary performance costs
+    "PGH",   # Pygrep hooks
+    "PIE",   # Unnecessary code
+    "PL",    # Pylint
+    "PT",    # Pytest
+    "PTH",   # Use Pathlib
+    "PYI",   # Stub files
+    "Q",     # Quotes
+    "RET",   # Return
+    "RUF",   # Ruff
+    "RSE",   # Raise
+    "S",     # Bandit
+    "SIM",   # Code simplification
+    "SLF",   # Private member access
+    "SLOT",  # __slots__
+    "T10",   # Debugger
+    "T20",   # Print
+    "TC",    # Type checking
+    "TD",    # "TODO"-comments
+    "TID",   # Tidy imports
+    "TRY",   # Exception handling
+    "UP",    # Pyupgrade
+    "W",     # Warnings
+    "YTT",   # sys.version
+]
+ignore = [
+    #### modules
+    "ANN", # flake8-annotations
+    "COM", # flake8-commas
+    "C90", # mccabe complexity
+    "DJ",  # django
+    "EXE", # flake8-executable
+    "T10", # debugger
+    "TID", # flake8-tidy-imports
+    "PGH", # pygrep-hooks
+
+    #### specific rules
+    "D100",    # ignore missing docs
+    "D200",    # unnecessary-multiline-docstring (TODO: remove)
+    "D205",    # missing-blank-line-after-summary
+    "PT009",   # pytest-unittest-assertion
+    "PT027",   # pytest-unittest-raises-assertion
+    "PLR0913", # too-many-arguments
+    "PLR0914", # too-many-locals
+    "UP006",   # non-pep585-annotation
+    "E731",    # lambda-assignment
+    "UP035",   # deprecated-import
+    "UP007",   # non-pep585-annotation
+    "PLR0915", # too-many-statements (TODO: remove)
+    "PLR0912", # too-many-branches (TODO: remove)
+    "FBT002",  # boolean-default-value-positional-argument
+    "FBT001",  # boolean-type-hint-positional-argument
+    "S101",    # asserts (TODO: remove)
+    "TC002",   # type-checking-violation for third-party code
+    "TC003",   # type-checking-violation for third-party code
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "pep257"
+
+[tool.ruff.lint.pylint]
+max-args = 15
+max-branches = 20
+max-returns = 10
+max-statements = 80
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 60
+indent-style = "space"
+line-ending = "lf"
+quote-style = "double"
+skip-magic-trailing-comma = false
+exclude = [
+    ".venv",
+    ".pytest_cache",
+    ".git",
+    "__pycache__",
+    "generated",
+    "scripts",
+    "data",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "dist",
+    "node_modules",
+    "venv",
+]

@@ -1,0 +1,90 @@
+---
+description: Pyright Rules
+globs: "**/*.py"
+alwaysApply: true
+---
+
+# Pyright Code Standards
+
+This project uses **Pyright** for static type checking. Treat Pyright warnings/errors as **design feedback**: they usually indicate unclear intent, unsafe assumptions, or missing contracts.
+
+## Quick Reference
+
+- Run locally: `task type-check`
+- Config location: `api-server/pyproject.toml`
+- Rule reference: https://github.com/microsoft/pyright/tree/main/docs
+
+## Core Principles
+
+Write Python that is **explicit, predictable, and type-safe**.
+Prefer clarity over cleverness.
+
+## General Standards
+
+- **No untyped public surfaces**: functions, methods, and exported symbols should have complete type hints.
+- **Use narrow types**: prefer `Sequence[T]` / `Mapping[K, V]` over `list` / `dict` in parameters unless mutability is required.
+- **Make `None` explicit**: use `T | None` and handle it via early returns/guards.
+- **Avoid implicit Any**: don’t “fix” errors by loosening types; adjust code or types to reflect reality.
+- **Keep types close to values**: annotate at the definition site; avoid scattered casts.
+
+## Working with Pyright
+
+### 1) Fix the root cause, don’t silence
+Prefer refactoring over suppression. Only use:
+- `# type: ignore[rule]` with a **specific rule**, not a blanket ignore
+- A short comment explaining why the ignore is safe
+
+Bad:
+```py
+x = mystery()  # type: ignore
+````
+
+Better:
+
+```py
+x = mystery()  # type: ignore[reportUnknownVariableType]  # third-party lib lacks stubs
+```
+
+### 2) Use `cast()` sparingly
+
+`typing.cast()` is allowed when you *know more than the checker*, but it should be rare.
+If you need repeated casts, introduce a helper function or refine the upstream type.
+
+### 3) Prefer type-narrowing patterns Pyright understands
+
+Use guards and structural checks:
+
+* `if x is None: ...`
+* `isinstance(x, ...)`
+* `assert x is not None` (only when truly guaranteed)
+
+### 4) Choose the right abstraction for structured data
+
+* Use `dataclass`/`pydantic` models for structured records.
+* Use `TypedDict` when dict-shapes are required (e.g., JSON-like payloads).
+* Use `Protocol` for behavioral typing (duck-typing with contracts).
+
+## Imports and typing hygiene
+
+* Use `from __future__ import annotations` if the project standard does (keep consistent).
+* Prefer `typing` primitives (`list[int]`, `dict[str, int]`) over `List`, `Dict` unless supporting older Python.
+* Put type-only imports behind:
+
+```py
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from some_module import SomeType
+```
+
+## When you touch typing config
+
+Pyright behavior is defined in `api-server/pyproject.toml`.
+When changing rule strictness, document why in the commit/PR and update any affected code patterns.
+
+## Practical checklist (before you commit)
+
+* [ ] `task type-check` passes
+* [ ] New/changed functions have complete type hints
+* [ ] No new `Any` leaks introduced
+* [ ] Any `type: ignore[...]` includes a rule code + justification
+

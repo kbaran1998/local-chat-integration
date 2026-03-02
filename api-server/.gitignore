@@ -1,0 +1,18 @@
+.venv/
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.test
+.env.production
+
+__pycache__
+.ruff_cache/
+.pytest_cache/
+.task/
+.cache/
+
+# Model weights (downloaded by scripts/download_weights.py)
+model_weights/

@@ -1,0 +1,129 @@
+version: '3'
+
+env:
+  DOCKER_API_VERSION: "1.53"
+
+vars:
+  PYTHON_VERSION: ">=3.13"
+  IMAGE_NAME: "api-server"
+
+tasks:
+  install:
+    desc: Install all dependencies (including dev dependencies)
+    cmds:
+      - uv sync
+
+  run:
+    desc: Run the FastAPI development server with auto-reload
+    cmds:
+      - uv run uvicorn main:app --reload
+
+  serve:
+    desc: Run the FastAPI production server
+    cmds:
+      - uv run uvicorn main:app --host 0.0.0.0 --port 8000
+
+  lint:
+    desc: Run ruff linter to check code quality
+    cmds:
+      - uv run ruff check .
+
+  lint-fix:
+    desc: Run ruff linter and automatically fix issues
+    cmds:
+      - uv run ruff check . --fix
+
+  format:
+    desc: Format code with ruff
+    cmds:
+      - uv run ruff format .
+
+  format-check:
+    desc: Check code formatting without making changes
+    cmds:
+      - uv run ruff format . --check
+
+  type-check:
+    desc: Run pyright type checker
+    cmds:
+      - uv run pyright
+
+  test:
+    desc: Run pytest tests
+    cmds:
+      - uv run pytest
+
+  test-cov:
+    desc: Run pytest with coverage report
+    cmds:
+      - uv run pytest --cov=app --cov-report=term-missing
+
+  check:
+    desc: Run all checks (format-check, lint, type-check, test)
+    cmds:
+      - task: format-check
+      - task: lint
+      - task: type-check
+      - task: test
+
+  fix:
+    desc: Auto-fix formatting and linting issues
+    cmds:
+      - task: format
+      - task: lint-fix
+
+  clean:
+    desc: Clean up Python cache files and build artifacts
+    cmds:
+      - rm -rf __pycache__
+      - rm -rf .pytest_cache
+      - rm -rf .ruff_cache
+      - rm -rf .coverage
+      - find . -type d -name "__pycache__" -exec rm -rf {} +
+      - find . -type f -name "*.pyc" -delete
+
+  upgrade:
+    desc: Upgrade all dependencies to latest versions
+    cmds:
+      - uv sync --upgrade
+
+  add:
+    desc: Add a new package (usage - task add -- package-name)
+    cmds:
+      - uv add {{.CLI_ARGS}}
+
+  add-dev:
+    desc: Add a new dev package (usage - task add-dev -- package-name)
+    cmds:
+      - uv add --dev {{.CLI_ARGS}}
+
+  shell:
+    desc: Activate the virtual environment shell
+    cmds:
+      - uv run bash
+
+  download-weights:
+    desc: Download model weights from Hugging Face (uses api-server config)
+    cmds:
+      - uv run python scripts/download_weights.py
+
+  down-docker:
+    desc: Stop and remove the api-server container
+    cmds:
+      - docker stop {{.IMAGE_NAME}}
+      - docker rm {{.IMAGE_NAME}}
+
+  build-docker:
+    desc: Build the api-server image
+    cmds:
+      - docker build -t {{.IMAGE_NAME}} .
+
+  run-docker:
+    desc: Run the api-server container
+    cmds:
+      - docker run -p 8000:8000 --network=host --name {{.IMAGE_NAME}} {{.IMAGE_NAME}}
+
+  run-docker-d:
+    desc: Run the api-server container in detached mode
+    cmds:
+      - docker run -p 8000:8000 --network=host -d --name {{.IMAGE_NAME}} {{.IMAGE_NAME}}

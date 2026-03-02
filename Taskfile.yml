@@ -1,0 +1,49 @@
+version: '3'
+
+env:
+  DOCKER_API_VERSION: "1.53"
+
+includes:
+  web-app:
+    dir: ./web-app
+    taskfile: ./web-app/Taskfile.yml
+  api-server:
+    dir: ./api-server
+    taskfile: ./api-server/Taskfile.yml
+
+tasks:
+  install:
+    desc: Install the dependencies
+    cmds:
+      - task: web-app:install
+      - task: api-server:install
+
+  docker-up:
+    desc: Start the services in detached mode
+    cmds:
+      - docker compose -f docker-compose.yml up -d
+
+  docker-up-build:
+    desc: Build and start the services in detached mode
+    cmds:
+      - docker compose -f docker-compose.yml up -d --build
+
+  docker-down:
+    desc: Stop and remove the database container
+    cmds:
+      - docker compose -f docker-compose.yml down
+
+  docker-build:
+    desc: Build the database service image
+    cmds:
+      - docker compose -f docker-compose.yml build
+
+  docker-ps:
+    desc: Show status of the services
+    cmds:
+      - docker compose -f docker-compose.yml ps
+
+  docker-logs:
+    desc: Tail logs from the services
+    cmds:
+      - docker compose -f docker-compose.yml logs -f
